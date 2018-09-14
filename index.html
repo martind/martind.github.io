@@ -1,9 +1,134 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <title>martind's cave of wonders</title>
+    <meta charset="utf-8">
+    <title>martind's cave of wonders</title>
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet" type="text/css">
+    <style>
+        /* reset stuff */
+        html {
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        /* actual css */
+        body {
+            font-family: VT323, monaco, Consolas, "Lucida Console", monospace;
+            margin-left: 24px;
+        }
+
+        ul, ol {
+            list-style-position: inside;
+        }
+
+        header li::before {
+            content: "> ";
+        }
+
+        section h2::before {
+            content: "# ";
+        }
+    </style>
 </head>
 <body>
-  <h1>hey there!</h1>
+    <header>
+        <h1>diego martinelli - @martind</h1>
+        <ul>
+            <li>developer, software craftsman</li>
+            <li>husband, father</li>
+        </ul>
+    </header>
+
+    <section id="social">
+        <h2>you can found me in some places...</h2>
+        <ol>
+            <li><a href="https://github.com/martind">GitHub</a></li>
+            <li><a href="https://keybase.io/martind81">Keybase</a></li>
+            <li><a href="https://www.linkedin.com/in/diego-martinelli-aa30892/">LinkedIn</a></li>
+        </ol>
+    </section>
+
+    <section id="jobs">
+        <h2>I've worked at...</h2>
+        <ol>
+            <li>YOOX Net-A-Porter Group - (January 2016 - Present)</li>
+            <li>e-Soft s.r.l. - (February 2006 - December 2015)</li>
+        </ol>
+    </section>
+
+    <section id="contrib">
+        <h2>things I've contributed to...</h2>
+        <ol>
+            <li><a href="https://docs.factorcode.org/content/author-Diego%20Martinelli.html">Factor - A practical stack language</a></li>
+        </ol>
+    </section>
+
+    <section id="code">
+        <h2>things I've written...</h2>
+        <ol id="projects">
+            <div>Loading...</div>
+        </ol>
+    </section>
+
+    <script>
+        function fillProjects(projects) {
+            const projectsNode = document.getElementById('projects')
+            projectsNode.removeChild(projectsNode.firstElementChild)
+
+            projects.forEach(p => {
+                const li = document.createElement('li')
+                const a = document.createElement('a')
+
+                a.href = p.url
+                let description = p.name
+                if (p.description)
+                    description += ` - ${p.description}`
+                description += ` (${p.stars} stars - ${p.forks} forks)`
+
+                a.innerText = description
+
+                li.appendChild(a)
+                projectsNode.appendChild(li)
+            })
+        }
+
+        function fetchRepos() {
+            const githubReposEndpoint = 'https://api.github.com/users/martind/repos'
+
+            fetch(githubReposEndpoint)
+                .then(response => response.json())
+                .then(repos => {
+                    const projects = repos.filter(r => !r.fork)
+                    .map(r => {
+                        return {
+                            name: r.name,
+                            description: r.description,
+                            url: r.html_url,
+                            stars: r.stargazers_count,
+                            forks: r.forks
+                        }
+                    })
+
+                    fillProjects(projects)
+                })
+                .catch(err => console.log(err))
+        }
+
+        fetchRepos()
+    </script>
 </body>
 </html>
+
