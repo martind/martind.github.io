@@ -26,39 +26,31 @@
 
         /* actual css */
         :root {
-            --bg-color: #ffef16;
-            --shadow-color: rgb(240, 140, 20);
+            --bg-color: #000;
+            --shadow-color: #0f0;
+            --text-color: #0f0;
         }
 
         body {
             font-family: VT323, monaco, Consolas, "Lucida Console", monospace;
-            margin-left: 24px;
+            margin-left: 5vw;
             background-color: var(--bg-color);
+            color: var(--text-color);
+            text-shadow: -0.2em -0.2em 1.2em var(--shadow-color);
         }
 
         a {
-            color: black;
+            color: var(--text-color);
             text-decoration: none;
         }
 
         a:hover {
-            background-color: black;
-            color: white;
+            background-color: var(--text-color);
+            color: black;
         }
 
         ul, ol {
             list-style-position: inside;
-        }
-
-        header {
-            text-shadow:
-                0.05em 0.05em var(--bg-color),
-                0.1em 0.1em var(--bg-color),
-                0.15em 0.15em var(--bg-color),
-                -0.05em -0.05em var(--shadow-color),
-                -0.1em -0.1em var(--shadow-color),
-                -0.15em -0.15em var(--shadow-color),
-                -0.2em -0.2em var(--shadow-color);
         }
 
         header h1 {
