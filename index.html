@@ -25,17 +25,73 @@
         }
 
         /* actual css */
+        :root {
+            --bg-color: #ffef16;
+            --shadow-color: rgb(240, 140, 20);
+        }
+
         body {
             font-family: VT323, monaco, Consolas, "Lucida Console", monospace;
             margin-left: 24px;
+            background-color: var(--bg-color);
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        a:hover {
+            background-color: black;
+            color: white;
         }
 
         ul, ol {
             list-style-position: inside;
         }
 
+        header {
+            text-shadow:
+                0.05em 0.05em var(--bg-color),
+                0.1em 0.1em var(--bg-color),
+                0.15em 0.15em var(--bg-color),
+                -0.05em -0.05em var(--shadow-color),
+                -0.1em -0.1em var(--shadow-color),
+                -0.15em -0.15em var(--shadow-color),
+                -0.2em -0.2em var(--shadow-color);
+        }
+
+        header h1 {
+            font-size: 15vw;
+        }
+
+        header h2 {
+            font-size: 9vw;
+        }
+
+        header ul {
+            font-size: 5.5vw;
+            margin-top: 3vw;
+        }
+
         header li::before {
             content: "> ";
+        }
+
+        section {
+            margin-top: 3em;
+        }
+
+        section > * {
+            margin-bottom: 20px;
+        }
+
+        section h2 {
+            font-size: 1.8em;
+        }
+
+        section ol, section p {
+            font-size: 1.5em;
         }
 
         section h2::before {
@@ -45,12 +101,17 @@
 </head>
 <body>
     <header>
-        <h1>diego martinelli - @martind</h1>
+        <h1>@martind</h1>
+        <h2>diego martinelli</h2>
         <ul>
             <li>developer, software craftsman</li>
-            <li>husband, father</li>
         </ul>
     </header>
+
+    <section id="about">
+        <h2>about</h2>
+        <p>This is why I'm super awesome...</p>
+    </section>
 
     <section id="social">
         <h2>you can found me in some places...</h2>
@@ -77,7 +138,7 @@
     </section>
 
     <section id="code">
-        <h2>things I've written...</h2>
+        <h2>open source things I've written...</h2>
         <ol id="projects">
             <div>Loading...</div>
         </ol>
@@ -111,16 +172,17 @@
             fetch(githubReposEndpoint)
                 .then(response => response.json())
                 .then(repos => {
-                    const projects = repos.filter(r => !r.fork)
-                    .map(r => {
-                        return {
-                            name: r.name,
-                            description: r.description,
-                            url: r.html_url,
-                            stars: r.stargazers_count,
-                            forks: r.forks
-                        }
-                    })
+                    const projects = repos
+                        .filter(r => !r.fork)
+                        .map(r => {
+                            return {
+                                name: r.name,
+                                description: r.description,
+                                url: r.html_url,
+                                stars: r.stargazers_count,
+                                forks: r.forks
+                            }
+                        })
 
                     fillProjects(projects)
                 })
