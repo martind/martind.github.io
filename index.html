@@ -112,6 +112,7 @@
     <section id="social">
         <h2>you can find me in some places...</h2>
         <ol>
+            <li><a href="javascript:gotoDecrypted('8485292172b41efea15247738a61068e239665dbaf158c69190dfdb73ba7f51c3b', 'e9e4404d06db2493c020331ae4046ae24ab801b2ca72e3297e609cde5789967356');">Mail</a></li>
             <li><a href="https://github.com/martind">GitHub</a></li>
             <li><a href="https://keybase.io/martind81">Keybase</a></li>
             <li><a href="https://www.linkedin.com/in/diego-martinelli-aa30892/">LinkedIn</a></li>
@@ -184,6 +185,47 @@
                     fillProjects(projects)
                 })
                 .catch(err => console.log(err))
+        }
+
+        function encrypt(cleartext) {
+            let key = cleartext.split('').map(_ => Math.floor(Math.random() * 255))
+            let secret = []
+
+            for (let i = 0; i < cleartext.length; i++) {
+                let xor = ((cleartext[i].charCodeAt(0) & 0xff) ^ key[i]).toString(16)
+                secret.push(xor.length < 2 ? '0' + xor : xor)
+            }
+
+            let keyHex = key.map(c => {
+                let hex = c.toString(16)
+                return hex.length < 2 ? '0' + hex : hex
+            }).join('')
+
+            return [keyHex, secret.join('')]
+        }
+
+        function decrypt(key, secret) {
+            function getBytes(hex) {
+                let bytes = []
+                for (let c = 0; c < hex.length; c += 2) {
+                    bytes.push(parseInt(hex.substr(c, 2), 16))
+                }
+                return bytes
+            }
+
+            let keyBytes = getBytes(key)
+            let secretBytes = getBytes(secret)
+
+            let cleartext = ''
+            for (let i = 0; i < keyBytes.length; ++i) {
+                cleartext += String.fromCharCode(keyBytes[i] ^ secretBytes[i])
+            }
+
+            return cleartext
+        }
+
+        function gotoDecrypted(key, secret) {
+            location.href = decrypt(key, secret)
         }
 
         fetchRepos()
