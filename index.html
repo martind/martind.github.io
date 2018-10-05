@@ -164,6 +164,10 @@
             })
         }
 
+        function cacheProjects(projects) {
+            localStorage.setItem('repos', JSON.stringify(projects))
+        }
+
         function fetchRepos() {
             const githubReposEndpoint = 'https://api.github.com/users/martind/repos'
 
@@ -183,6 +187,7 @@
                         })
 
                     fillProjects(projects)
+                    cacheProjects(projects)
                 })
                 .catch(err => console.log(err))
         }
@@ -228,7 +233,12 @@
             location.href = decrypt(key, secret)
         }
 
-        fetchRepos()
+        const projects = localStorage.getItem('repos')
+        if (projects) {
+            fillProjects(JSON.parse(projects))
+        } else {
+            fetchRepos()
+        }
     </script>
 </body>
 </html>
