@@ -144,55 +144,6 @@
     </section>
 
     <script>
-        function fillProjects(projects) {
-            const projectsNode = document.getElementById('projects')
-            projectsNode.removeChild(projectsNode.firstElementChild)
-
-            projects.forEach(p => {
-                let description = p.name
-                if (p.description)
-                    description += ` - ${p.description}`
-                description += ` (${p.stars} stars - ${p.forks} forks)`
-
-                const a = document.createElement('a')
-                a.innerText = description
-                a.href = p.url
-
-                const li = document.createElement('li')
-                li.appendChild(a)
-
-                projectsNode.appendChild(li)
-            })
-        }
-
-        function cacheProjects(projects) {
-            localStorage.setItem('repos', JSON.stringify(projects))
-        }
-
-        function fetchRepos() {
-            const githubReposEndpoint = 'https://api.github.com/users/martind/repos'
-
-            fetch(githubReposEndpoint)
-                .then(response => response.json())
-                .then(repos => {
-                    const projects = repos
-                        .filter(r => !r.fork)
-                        .map(r => {
-                            return {
-                                name: r.name,
-                                description: r.description,
-                                url: r.html_url,
-                                stars: r.stargazers_count,
-                                forks: r.forks
-                            }
-                        })
-
-                    fillProjects(projects)
-                    cacheProjects(projects)
-                })
-                .catch(err => console.log(err))
-        }
-
         function encrypt(cleartext) {
             let key = cleartext.split('').map(_ => Math.floor(Math.random() * 255))
             let secret = []
@@ -234,11 +185,83 @@
             location.href = decrypt(key, secret)
         }
 
+        function fillProjects(projects) {
+            const projectsNode = document.getElementById('projects')
+            projectsNode.removeChild(projectsNode.firstElementChild)
+
+            projects.forEach(p => {
+                let description = p.name
+                if (p.description)
+                    description += ` - ${p.description}`
+                description += ` (${p.stars} stars - ${p.forks} forks)`
+
+                const a = document.createElement('a')
+                a.innerText = description
+                a.href = p.url
+
+                const li = document.createElement('li')
+                li.appendChild(a)
+
+                projectsNode.appendChild(li)
+            })
+        }
+
+        function cacheProjects(projects) {
+            localStorage.setItem('repos', JSON.stringify(projects))
+            localStorage.setItem('lastFetch', Date.now())
+        }
+
+        function fetchRepos() {
+            const githubReposEndpoint = 'https://api.github.com/users/martind/repos'
+
+            return fetch(githubReposEndpoint)
+                .then(response => response.json())
+                .then(repos => {
+                    return repos.filter(r => !r.fork)
+                                .map(r => ({
+                                    name: r.name,
+                                    description: r.description,
+                                    url: r.html_url,
+                                    stars: r.stargazers_count,
+                                    forks: r.forks
+                                }))
+                                .sort((r1, r2) => {
+                                    if (r1.stars < r2.stars) {
+                                        return 1
+                                    }
+                                    else if (r1.stars > r2.stars) {
+                                        return -1
+                                    }
+
+                                    return r1.name.localeCompare(r2.name)
+                                })
+                })
+                .catch(err => {
+                    console.log(err)
+                    return []
+                })
+        }
+
+        function needToFetchProjects(lastFetch, projects) {
+            const FIVE_DAYS_IN_MILLISECONDS = 5 * 24 * 60 * 60 * 1000
+
+            return !lastFetch ||
+                   Date.now() - lastFetch >= FIVE_DAYS_IN_MILLISECONDS ||
+                   !projects ||
+                   projects === '[]'
+        }
+
+        const lastFetch = localStorage.getItem('lastFetch')
         const projects = localStorage.getItem('repos')
-        if (projects) {
-            fillProjects(JSON.parse(projects))
-        } else {
+
+        if (needToFetchProjects(lastFetch, projects)) {
             fetchRepos()
+                .then(fetchedProjects => {
+                    fillProjects(fetchedProjects)
+                    cacheProjects(fetchedProjects)
+                })
+        } else {
+            fillProjects(JSON.parse(projects))
         }
     </script>
 </body>
